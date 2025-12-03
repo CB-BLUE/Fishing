@@ -1,52 +1,30 @@
-# Fishing — Saltwater Showdown
+# Saltwater Sport Fishing — PWA Competition App
 
-# Fishing Web-App 🎣
+This repository contains a multi-page, offline-capable PWA for saltwater sport fishing competitions:
+- Register competitions, register competitors
+- QR-based check-in
+- Photo proof with timestamp overlay (EXIF-aware)
+- PDF receipts, offline caching, PWA manifest
+- Payment sandbox + server webhook example for production payments
 
-[![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen)](https://cb-blue.github.io/Fishing/)
+## Quick start (frontend)
+1. Copy files to repo root. Ensure `index.html` is lowercase.
+2. Commit & push to `main`.
+3. Enable GitHub Pages: Settings → Pages → Branch: main → Root → Save.
+4. Visit `https://<username>.github.io/<repo>/`.
 
-A platform to register and manage fishing competitions — a minimal static demo to create competitions, share QR/join links, show basic weather/tide info and produce printable permits.
+## Payment
+- The included `payment-sandbox.html` is a demo only. For real payments, deploy `server/server.js` to render/railway/Heroku and configure PayFast IPN to point to `https://<your-host>/payfast/ipn`. Do not store merchant keys in this repo.
 
-Owner: CB-BLUE
+## Libraries used (CDN)
+- QR code: qrcodejs (cdnjs)
+- EXIF: exif-js (jsdelivr)
+- jsPDF: cdnjs
 
-Overview
-- Single-file static demo (Index.html) demonstrating:
-  - Create competition (name, fee, date, spot)
-  - Generate shareable join URL and QR code
-  - Live weather (Open-Meteo) and tide times (WorldTides)
-  - PayFast checkout integration (sandbox example)
-  - Generate printable permit PDF via jsPDF
+## Extending
+- Add Open-Meteo tide/weather hooks into `competitions.html` or a dedicated dashboard page.
+- Add Leaflet + OSM for spot maps.
+- Replace IndexedDB with Firebase Firestore + Storage for cloud sync.
 
-Quickstart
-1. Clone or download the repository.
-2. Serve the folder (recommended) or open Index.html in a browser:
-   - Recommended static server: `npx http-server` or `python -m http.server`
-3. Create a competition, copy/share the generated link or QR code, or open the link directly to join.
-
-Configuration & Notes
-- PayFast:
-  - The example contains sandbox merchant_id/merchant_key placeholders. Replace with live credentials for production.
-- WorldTides:
-  - The example uses a demo key variable; register at https://www.worldtides.info to get a personal API key.
-- CORS and remote images:
-  - When generating PDFs with remote images, cross-origin restrictions may apply. The provided code attempts to load images with crossOrigin set to "Anonymous"; ensure remote servers send proper CORS headers.
-- Security:
-  - This is a demo single-file app and stores no server-side state. Do not use as-is for processing real payments or storing user data without adding secure server-side components.
-  - Remove sandbox keys and secrets and never commit production secrets.
-
-Files included
-- Index.html — demo application
-- README.md — this file
-- .gitignore — ignores common local/build artifacts
-- LICENSE — MIT license
-
-TODO / Suggested next steps
-- Add a small backend to:
-  - Persist competitions and participants
-  - Handle payment verification webhooks (PayFast)
-  - Issue server-generated PDF permits
-- Add unit/integration tests and CI
-- Deploy to a static host (Netlify, Vercel, GitHub Pages for public demos)
-- Add CONTRIBUTING.md and CODE_OF_CONDUCT for collaborators
-
-License
-- MIT (see LICENSE)
+## License
+MIT — feel free to adapt.
