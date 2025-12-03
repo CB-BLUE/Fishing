@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport"content="width=device-width,initial-scale=1"><title>Payment Sandbox</title><link rel="stylesheet" href="/styles.css"></head>
+<body>
+  <main class="container">
+    <h2>Sandbox Payment</h2>
+    <p>This demo simulates marking the competitor as paid (for demo/testing). For production you must implement a server webhook (see /server/server.js).</p>
+    <div id="info" class="card"></div>
+    <button id="pay" class="cta">Simulate Payment (Sandbox)</button>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const competitor = params.get('competitor'); const comp = params.get('comp');
+    document.getElementById('info').textContent = `Competitor: ${competitor} • Competition: ${comp}`;
+    document.getElementById('pay').addEventListener('click', ()=>{
+      const r = indexedDB.open('fishing-db');
+      r.onsuccess = e => {
+        const db = e.target.result; const tx = db.transaction('competitors','readwrite'); const store = tx.objectStore('competitors');
+        const req = store.get(competitor);
+        req.onsuccess = () => {
+          const data = req.result || {}; data.paid = true; store.put(data);
+          alert('Payment simulated & marked paid.');
+        };
+      };
+    });
+  </script>
+</body>
+</html>
