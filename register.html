@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register — Saltwater Sport Fishing</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header"><div class="brand">🎣 Saltwater Sport Fishing</div></header>
+  <main class="container">
+    <h2>Register for Competition</h2>
+    <div id="comp-info"></div>
+
+    <form id="reg-form" class="card">
+      <input name="name" placeholder="Competitor name" required />
+      <input name="email" type="email" placeholder="Email" />
+      <input name="phone" placeholder="Phone" />
+      <label>Proof photo (required)</label>
+      <input id="photo" type="file" accept="image/*" required />
+      <div id="preview"></div>
+      <button type="submit" class="cta">Finish & Pay</button>
+    </form>
+
+    <div id="result"></div>
+  </main>
+
+  <script type="module">
+    import { DB } from '/comps-db.js';
+    await DB.open();
+    import { processUpload } from '/uploads.js';
+
+    const params = new URLSearchParams(location.search);
+    const compId = params.get('comp');
+    const comp = await DB.get('comps', compId);
+    document.getElementById('comp-info').innerHTML = comp ? `<h3>${escapeHtml(comp.name)} — ${comp.date}</h3>` : '<p>Competition not found</p>';
+
+    document.getElementById('photo').addEventListener('change', async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      const stamped = await processUpload(file);
+      const img = document.createElement('img'); img.src = stamped.dataUrl; img.style.maxWidth = '360px';
+      document.getElementById('preview').innerHTML = ''; document.getElementById('preview').appendChild(img);
+      document.getElementById('reg-form').stamped = stamped;
+    });
+
+    document.getElementById('reg-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const competitor = {
+        id: 'p-'+Date.now(),
+        compId,
+        name: fd.get('name'),
+        email: fd.get('email'),
+        phone: fd.get('phone'),
+        paid: false,
+        photo: e.target.stamped.dataUrl,
+        photoMeta: e.target.stamped.meta
+      };
+      await DB.add('competitors', competitor);
+
+      // Generate check-in QR
+      const checkinUrl = `${location.origin}/checkin.html?competitor=${competitor.id}`;
+      const qrEl = document.createElement('div'); qrEl.id='qrhere'; document.getElementById('result').appendChild(qrEl);
+      new QRCode(qrEl, { text: checkinUrl, width: 200, height: 200 });
+
+      // Payment sandbox link
+      const a = document.createElement('a'); a.href = `/payment-sandbox.html?competitor=${competitor.id}&comp=${compId}`; a.textContent = 'Proceed to Payment (Sandbox)'; a.target='_blank'; a.className='cta';
+      document.getElementById('result').appendChild(a);
+    });
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);}
+  </script>
+</body>
+</html>
