@@ -1,294 +1,55 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Saltwater Showdown — create and manage fishing competitions, generate QR join links, view weather/tides and print permits." />
-  <title>Saltwater Showdown - Fishing Comp App</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
-  <script src="https://js.payfast.co.za/v1/payfast.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(to bottom, #0f172a, #1e293b); color: white; }
-    .spot-img { height: 180px; object-fit: cover; border-radius: 12px; }
-    a { color: #06b6d4; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Saltwater Sport Fishing — Home</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="stylesheet" href="/styles.css" />
+  <meta name="theme-color" content="#03344a" />
 </head>
-<body class="min-h-screen">
+<body>
+  <header class="site-header">
+    <div class="brand">🎣 Saltwater Sport Fishing</div>
+    <nav class="nav">
+      <a href="/index.html">Home</a>
+      <a href="/competitions.html">Competitions</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </header>
 
-<div class="container mx-auto px-4 py-8 max-w-5xl">
-
-  <h1 class="text-5xl font-bold text-center mb-2">Saltwater Showdown</h1>
-  <p class="text-center text-cyan-300 mb-10">The Ultimate SA Fishing Competition App</p>
-
-  <!-- CREATE COMPETITION -->
-  <div class="bg-slate-800 rounded-2xl p-8 mb-10 shadow-2xl" role="region" aria-labelledby="createHeading">
-    <h2 id="createHeading" class="text-3xl mb-6">Create New Competition</h2>
-    <div class="grid md:grid-cols-2 gap-6">
-      <input id="compName" aria-label="Competition name" placeholder="Competition Name" class="p-3 rounded-lg bg-slate-700 text-white"/>
-      <input id="entryFee" aria-label="Entry fee" min="0" type="number" placeholder="Entry Fee (R)" class="p-3 rounded-lg bg-slate-700 text-white"/>
-      <input id="compDate" aria-label="Competition date" type="date" class="p-3 rounded-lg bg-slate-700 text-white"/>
-      <select id="spot" aria-label="Fishing spot" class="p-3 rounded-lg bg-slate-700 text-white">
-        <option value="">Select Fishing Spot</option>
-        <option value="-29.8587,31.0218">Durban</option>
-        <option value="-33.9249,18.4241">Cape Town</option>
-        <option value="-34.0389,23.0481">Plettenberg Bay</option>
-        <option value="-28.7830,32.0377">Richards Bay</option>
-        <option value="-33.0153,27.9116">East London</option>
-        <option value="-34.1833,22.1500">Mossel Bay</option>
-      </select>
-      <button id="createBtn" aria-label="Create competition" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold py-4 rounded-xl">
-        Create & Generate QR
-      </button>
+  <main class="hero">
+    <div class="hero-inner">
+      <h1>Plan. Compete. Win.</h1>
+      <p>The ultimate free platform for saltwater sport fishing competitions: registration, QR check-ins, tide & weather, proof photo stamps, and installable PWA.</p>
+      <a class="cta" href="/competitions.html">Browse Competitions</a>
     </div>
-  </div>
+  </main>
 
-  <!-- QR + LINK -->
-  <div id="qrSection" class="hidden text-center bg-slate-800 rounded-2xl p-10" aria-live="polite">
-    <h3 class="text-2xl mb-4">Share This QR Code</h3>
-    <div id="qrcode" class="inline-block bg-white p-4 rounded-xl" aria-hidden="true"></div>
-    <p class="mt-4 break-all text-cyan-300" id="joinLink"></p>
-    <button id="printBtn" class="mt-6 bg-green-600 hover:bg-green-500 px-8 py-3 rounded-lg">
-      Print Permit (PDF)
-    </button>
-  </div>
+  <section class="container features">
+    <article class="card">
+      <h3>Tide & Weather</h3>
+      <p>Integrated marine forecasts and moon phases (Open-Meteo / WorldTides).</p>
+    </article>
+    <article class="card">
+      <h3>QR Check-Ins</h3>
+      <p>Create and scan competitor QR codes for fast check-ins.</p>
+    </article>
+    <article class="card">
+      <h3>Proof Photos</h3>
+      <p>Upload pictures with date/time and optional GPS stamping for leaderboard proofing.</p>
+    </article>
+  </section>
 
-  <!-- LIVE DATA (Weather + Tide) -->
-  <div id="liveData" class="hidden grid md:grid-cols-2 gap-8 mt-12">
-    <div class="bg-slate-800 rounded-2xl p-6">
-      <h3 class="text-2xl mb-4">Weather Forecast</h3>
-      <div id="weather"></div>
-    </div>
-    <div class="bg-slate-800 rounded-2xl p-6">
-      <h3 class="text-2xl mb-4">Tide Times (Next 24h)</h3>
-      <div id="tides" class="text-sm"></div>
-    </div>
-  </div>
+  <footer class="site-footer">© <span id="yr"></span> Saltwater Sport Fishing — Free & Open</footer>
 
-</div>
+  <!-- External libs via CDN (no files to commit) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="" crossorigin="anonymous"></script>
 
-<script>
-const spots = {
-  "-29.8587,31.0218": { name: "Durban", img: "https://images.unsplash.com/photo-1588196749597-743a3be6b9d9?w=800&auto=format&q=60" },
-  "-33.9249,18.4241": { name: "Cape Town", img: "https://images.unsplash.com/photo-1587502536900-baf0c55a4646?w=800&auto=format&q=60" },
-  "-34.0389,23.0481": { name: "Plettenberg Bay", img: "https://images.unsplash.com/photo-1573553223392-0c65b5076d2e?w=800&auto=format&q=60" },
-  "-28.7830,32.0377": { name: "Richards Bay", img: "https://images.unsplash.com/photo-1589300960815-15de7b94b547?w=800&auto=format&q=60" },
-  "-33.0153,27.9116": { name: "East London", img: "https://images.unsplash.com/photo-1622396433978-9429e80e7b93?w=800&auto=format&q=60" },
-  "-34.1833,22.1500": { name: "Mossel Bay", img: "https://images.unsplash.com/photo-1590524731152-1c2f73727e0c?w=800&auto=format&q=60" }
-};
-
-let currentComp = {};
-
-function safeText(t){ return String(t||''); }
-
-function setHidden(id, hidden){
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.toggle('hidden', hidden);
-}
-
-async function createComp() {
-  const name = safeText(document.getElementById("compName").value) || "My Fishing Comp";
-  const feeRaw = document.getElementById("entryFee").value;
-  const fee = feeRaw !== "" ? Number(feeRaw) : 150;
-  const date = document.getElementById("compDate").value || "";
-  const spotVal = document.getElementById("spot").value;
-
-  if (!spotVal) return alert("Please select a fishing spot!");
-  if (isNaN(fee) || fee < 0) return alert("Please enter a valid non-negative entry fee.");
-
-  const spotArr = spotVal.split(",");
-  const spotKey = spotArr.join(",");
-  currentComp = { name, fee, date, spot: spotArr, spotName: spots[spotKey] ? spots[spotKey].name : spotKey };
-
-  const url = new URL(location.href);
-  url.searchParams.set("comp", btoa(JSON.stringify(currentComp)));
-  const joinUrl = url.toString();
-
-  // Show QR
-  setHidden('qrSection', false);
-  document.getElementById("joinLink").textContent = joinUrl;
-
-  // Clear previous QR content
-  const qrContainer = document.getElementById("qrcode");
-  qrContainer.innerHTML = '';
-  new QRCode(qrContainer, {
-    text: joinUrl,
-    width: 256,
-    height: 256,
-    colorDark: "#000",
-    colorLight: "#fff"
-  });
-
-  loadLiveData(spotArr[0], spotArr[1]).catch(err => {
-    console.warn('Live data error:', err);
-  });
-  setHidden('liveData', false);
-}
-
-// Load on join (if URL has comp param)
-window.onload = () => {
-  const params = new URLSearchParams(location.search);
-  const compData = params.get("comp");
-  if (compData) {
-    try {
-      currentComp = JSON.parse(atob(compData));
-      const spotKey = currentComp.spot ? currentComp.spot.join(",") : '';
-      const spotMeta = spots[spotKey] || { img: '', name: spotKey };
-      document.body.innerHTML = `<div class="container mx-auto px-4 py-20 text-center">
-        <h1 class="text-5xl mb-6">${escapeHtml(currentComp.name)}</h1>
-        <p class="text-3xl mb-8">Entry Fee: R${Number(currentComp.fee).toFixed(2)}</p>
-        <p class="text-xl mb-10">${escapeHtml(spotMeta.name)} • ${escapeHtml(currentComp.date || 'Open Dates')}</p>
-        <div class="bg-white p-10 inline-block rounded-2xl">
-          <img src="${spotMeta.img}" alt="${escapeHtml(spotMeta.name)}" class="spot-img"/>
-        </div>
-        <div class="mt-10">
-          <button id="payNowBtn" class="bg-green-600 hover:bg-green-500 text-2xl px-12 py-6 rounded-xl">
-            Pay R${Number(currentComp.fee).toFixed(2)} & Join Now
-          </button>
-        </div>
-      </div>`;
-      document.getElementById('payNowBtn').addEventListener('click', payNow);
-      loadLiveData(currentComp.spot[0], currentComp.spot[1]).catch(err => console.warn(err));
-    } catch (e) {
-      console.error('Invalid comp param', e);
-    }
-  } else {
-    // attach create handler
-    document.getElementById('createBtn').addEventListener('click', createComp);
-    document.getElementById('printBtn').addEventListener('click', printPermit);
-  }
-};
-
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;', "'":"&#39;"})[m]; });
-}
-
-function payNow() {
-  // NOTE: Replace merchant_id and merchant_key with production keys when going live
-  if (!currentComp || !currentComp.fee) return alert('No competition selected.');
-  PayFast.checkout({
-    merchant_id: "10000100",
-    merchant_key: "46f0cd6947f16",
-    amount: currentComp.fee,
-    item_name: currentComp.name + " Entry",
-    email_confirmation: "1",
-    confirmation_address: "you@example.com",
-    return_url: location.href + "&paid=1",
-    cancel_url: location.href
-  });
-}
-
-async function loadLiveData(lat, lon) {
-  // Weather - Open-Meteo (free, no key)
-  try {
-    const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Africa/Johannesburg`);
-    if (!weatherRes.ok) throw new Error('Weather fetch failed');
-    const weather = await weatherRes.json();
-    const today = weather.daily;
-    const code = today.weathercode[0];
-    const desc = {0:"Clear", 1:"Mainly clear", 2:"Partly cloudy", 3:"Overcast", 45:"Fog", 61:"Rain", 95:"Thunderstorm"}[code] || "Cloudy";
-
-    document.getElementById("weather").innerHTML = `
-      <p class="text-3xl">${today.temperature_2m_max[0]}°C / ${today.temperature_2m_min[0]}°C</p>
-      <p class="text-xl opacity-80">${desc}</p>
-      <p>Rain chance: ${today.precipitation_probability_max[0]}%</p>
-    `;
-  } catch (e) {
-    document.getElementById("weather").innerHTML = `<p class="opacity-80">Weather data currently unavailable.</p>`;
-    console.warn(e);
-  }
-
-  // Tide - WorldTides API
-  try {
-    const tideKey = "514f6efe-9585-46c5-bb11-2a8bdeb2e5f2"; // Replace with your key
-    const tideRes = await fetch(`https://www.worldtides.info/api/v3?heights&lat=${lat}&lon=${lon}&key=${tideKey || "demo"}`);
-    if (!tideRes.ok) throw new Error('Tide fetch failed');
-    const tide = await tideRes.json();
-    if (tide.heights) {
-      const next = tide.heights.slice(0, 6);
-      document.getElementById("tides").innerHTML = next.map(h => {
-        const time = new Date(h.date).toLocaleTimeString("en-ZA", {hour:"2-digit", minute:"2-digit"});
-        const type = h.height > 1 ? "High" : "Low";
-        return `<div class="py-1"><strong>${time}</strong> ${type} Tide ${h.height.toFixed(2)}m</div>`;
-      }).join("");
-    } else {
-      document.getElementById("tides").innerHTML = `<p class="opacity-80">Tide data unavailable.</p>`;
-    }
-  } catch (e) {
-    document.getElementById("tides").innerHTML = `<p class="opacity-80">Tide data currently unavailable.</p>`;
-    console.warn(e);
-  }
-}
-
-async function printPermit() {
-  if (!currentComp || !currentComp.name) return alert('Create a competition first.');
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(20);
-  doc.text("FISHING COMPETITION PERMIT", 105, 30, null, null, "center");
-  doc.setFontSize(16);
-  doc.text(currentComp.name, 105, 50, null, null, "center");
-  doc.text(`Location: ${currentComp.spotName}`, 105, 70, null, null, "center");
-  doc.text(`Date: ${currentComp.date || "Open"}`, 105, 80, null, null, "center");
-  doc.text(`Angler: _______________________`, 20, 110);
-  doc.text(`Paid: R${Number(currentComp.fee).toFixed(2)}`, 20, 130);
-
-  // Try to load the spot image and embed it into the PDF (handles crossOrigin)
-  try {
-    const spotKey = Array.isArray(currentComp.spot) ? currentComp.spot.join(",") : currentComp.spot;
-    const imgUrl = (spots[spotKey] && spots[spotKey].img) ? spots[spotKey].img : null;
-    if (imgUrl) {
-      const dataUrl = await toDataUrl(imgUrl);
-      if (dataUrl) {
-        const imgProps = doc.getImageProperties(dataUrl);
-        const maxWidth = 170;
-        const ratio = imgProps.width / imgProps.height;
-        const width = Math.min(maxWidth, imgProps.width);
-        const height = width / ratio;
-        doc.addImage(dataUrl, 'JPEG', 20, 150, width, height);
-      }
-    }
-  } catch (e) {
-    console.warn('Failed to add image to PDF:', e);
-  }
-
-  doc.save("Permit_" + currentComp.name.replace(/ /g, "_") + ".pdf");
-}
-
-// helper: convert remote image url to dataURL (attempts crossorigin)
-function toDataUrl(url, timeout = 8000) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    const timer = setTimeout(()=> {
-      resolve(null);
-    }, timeout);
-    img.onload = function() {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-        clearTimeout(timer);
-        resolve(dataURL);
-      } catch (err) {
-        clearTimeout(timer);
-        resolve(null);
-      }
-    };
-    img.onerror = function() {
-      clearTimeout(timer);
-      resolve(null);
-    };
-    img.src = url + (url.indexOf('?') === -1 ? '?' : '&') + 'cache_bust=' + Date.now();
-  });
-}
-</script>
-
+  <script type="module" src="/app.js"></script>
+  <script>document.getElementById('yr').textContent = new Date().getFullYear();</script>
 </body>
 </html>
