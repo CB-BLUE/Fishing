@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Competitions — Saltwater Sport Fishing</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">🎣 Saltwater Sport Fishing</div>
+    <nav class="nav">
+      <a href="/index.html">Home</a>
+      <a href="/competitions.html">Competitions</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h2>Competitions</h2>
+
+    <section class="card create">
+      <h3>Create Competition</h3>
+      <form id="create-comp">
+        <input name="name" placeholder="Competition name" required />
+        <input name="date" type="date" required />
+        <input name="fee" type="number" min="0" placeholder="Entry fee (ZAR)" />
+        <input name="location" placeholder="Location / venue" />
+        <button type="submit" class="cta">Create</button>
+      </form>
+    </section>
+
+    <section>
+      <h3>Upcoming Competitions</h3>
+      <div id="list"></div>
+    </section>
+  </main>
+
+  <div id="modal-root"></div>
+
+  <script type="module">
+    import { DB } from '/comps-db.js';
+    await DB.open();
+
+    const listEl = document.getElementById('list');
+
+    async function render() {
+      const items = await DB.getAll('comps');
+      if (!items.length) listEl.innerHTML = '<p>No competitions yet — create one!</p>';
+      else listEl.innerHTML = items.map(c => `
+        <div class="card">
+          <h4>${escapeHtml(c.name)}</h4>
+          <p>${c.date} • ${escapeHtml(c.location || '')}</p>
+          <div class="row">
+            <a class="small" href="/register.html?comp=${encodeURIComponent(c.id)}">Register</a>
+            <button class="small" data-id="${c.id}" onclick="generateQR('${c.id}')">Get QR</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('create-comp').addEventListener('submit', async e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const comp = { id: 'c-'+Date.now(), name: fd.get('name'), date: fd.get('date'), fee: Number(fd.get('fee')||0), location: fd.get('location') };
+      await DB.add('comps', comp);
+      e.target.reset();
+      render();
+    });
+
+    window.generateQR = async (compId) => {
+      const comp = await DB.get('comps', compId);
+      const url = `${location.origin}/register.html?comp=${encodeURIComponent(comp.id)}`;
+      const modal = document.createElement('div'); modal.className='modal';
+      modal.innerHTML = `<div class='modal-body'><h3>Registration QR for ${escapeHtml(comp.name)}</h3><div id='qr'></div><p>Share this with competitors</p><button id='close'>Close</button></div>`;
+      document.body.appendChild(modal);
+      new QRCode(modal.querySelector('#qr'), { text: url, width: 200, height: 200 });
+      modal.querySelector('#close').onclick = ()=> modal.remove();
+    };
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);}
+
+    render();
+  </script>
+</body>
+</html>
