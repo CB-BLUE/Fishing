@@ -1,5 +1,9 @@
 # Fishing — Saltwater Showdown
 
+# Fishing Web-App 🎣
+
+[![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen)](https://cb-blue.github.io/Fishing/)
+
 A platform to register and manage fishing competitions — a minimal static demo to create competitions, share QR/join links, show basic weather/tide info and produce printable permits.
 
 Owner: CB-BLUE
