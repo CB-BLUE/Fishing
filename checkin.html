@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Check-in — Saltwater Sport Fishing</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="site-header"><div class="brand">🎣 Saltwater Sport Fishing</div></header>
+  <main class="container">
+    <h2>Competitor Check-in</h2>
+    <div id="info" class="card"></div>
+    <div id="actions"></div>
+  </main>
+
+  <script type="module">
+    import { DB } from '/comps-db.js'; await DB.open();
+    const params = new URLSearchParams(location.search);
+    const competitorId = params.get('competitor');
+    const infoEl = document.getElementById('info');
+    const actions = document.getElementById('actions');
+
+    const competitor = await DB.get('competitors', competitorId);
+    if (!competitor) {
+      infoEl.innerHTML = '<p>Competitor not found</p>'; throw 0;
+    }
+    const comp = await DB.get('comps', competitor.compId);
+    infoEl.innerHTML = `<h3>${escapeHtml(competitor.name)}</h3>
+      <p>Competition: ${escapeHtml(comp?.name||'—')}</p>
+      <p>Paid: ${competitor.paid ? 'Yes' : 'No'}</p>
+      <div><img src="${competitor.photo}" style="max-width:360px;border-radius:8px" /></div>`;
+
+    const checkinBtn = document.createElement('button'); checkinBtn.textContent = 'Mark as Checked-in'; checkinBtn.className='cta';
+    checkinBtn.onclick = async () => {
+      competitor.checkedIn = new Date().toISOString();
+      await DB.add('competitors', competitor); // put/update (add will fail if exists; if fails, do put)
+      alert('Checked-in!');
+      location.reload();
+    };
+    actions.appendChild(checkinBtn);
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, (m)=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);}
+  </script>
+</body>
+</html>
